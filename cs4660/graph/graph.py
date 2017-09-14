@@ -36,6 +36,10 @@ def construct_graph_from_file(graph, file_path):
     2. for each following line (from second line to last line), add them as edge to graph
     3. return the graph
     """
+
+    f = open(file_path, encoding='utf-8')
+    text = f.read()
+    print(text)         
     return graph
 
 class Node(object):
