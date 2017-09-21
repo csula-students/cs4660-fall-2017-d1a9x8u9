@@ -55,8 +55,8 @@ def construct_graph_from_file(graph, file_path):
     edges = []
     x = 0
     for z in range(len(array)):
-        fromNode = array[x][0]
-        toNode = array[x][1]
+        fromNode = Node(array[x][0])
+        toNode = Node(array[x][1])
         weight = array[x][2]
         edge = Edge(fromNode,toNode,weight)
         edges.append(edge)
@@ -144,30 +144,48 @@ class AdjacencyList(object):
             return True
 
     def remove_node(self, node):
+        # Couldn't use del in 2d dictionary because it kept breaking out after finding a single match and therefore didn't complete the entire iteration. 
+        # So we're using a very bad algorithm to do this.
+
+        # If node exist in list, then delete that node.
         if node in self.adjacency_list:
             del self.adjacency_list[node]
+
+            # Arrays to keep track of key and subkeys 
+            x = []
+            y = []
+
+            # Iterate through key and subkeys and keep track of index
+            for key in self.adjacency_list:
+                for k in self.adjacency_list[key]:
+                    if k == node:
+                        x.append(key)
+                        y.append(k)
+
+            # Starting with index 0, use x[r] and y[r] as indexes to remove from adjacency_list
+            r = 0
+            for i in range(len(x)):
+                del self.adjacency_list[x[r]][y[r]]
+                r = r + 1
+
+            # Finally return true
             return True
+
         else:
             return False
 
     def add_edge(self, edge):
         # Get variables from Object edge
-        fromnode = Node(edge.from_node)
-        tonode = Node(edge.to_node)
+        fromnode = edge.from_node
+        tonode = edge.to_node
         weight = edge.weight
 
         # Check 2d array for fromnode and tonode, if NOT found add otherwise print out error
-        
-        print('NODE TO FIND:',fromnode)
-        for key in self.adjacency_list:
-            print(key, self.adjacency_list[key], fromnode.__eq__(key))
-
         if fromnode in self.adjacency_list:
             if tonode in self.adjacency_list[fromnode]:
                 return False
             else: 
                 self.adjacency_list[fromnode][tonode] = weight
-                # print('Added edge:', fromnode, tonode, self.adjacency_list[fromnode][tonode])
                 return True
         else:
                 return False
@@ -176,7 +194,6 @@ class AdjacencyList(object):
         # Get variables from Object edge
         fromnode = edge.from_node
         tonode = edge.to_node
-        weight = edge.weight
 
         # Check 2d array for fromnode and tonode, if found delete otherwise print out error
         if fromnode in self.adjacency_list:
