@@ -151,6 +151,8 @@ class AdjacencyList(object):
         if node in self.adjacency_list:
             del self.adjacency_list[node]
 
+            # Now we want to find other nodes that are connected to the node we want to remove. To do this, we'll iterate through the 2d array. 
+            
             # Arrays to keep track of key and subkeys 
             x = []
             y = []
@@ -162,7 +164,7 @@ class AdjacencyList(object):
                         x.append(key)
                         y.append(k)
 
-            # Starting with index 0, use x[r] and y[r] as indexes to remove from adjacency_list
+            # Starting with r = 0, use x[r] and y[r] as indexes to be removed from adjacency_list
             r = 0
             for i in range(len(x)):
                 del self.adjacency_list[x[r]][y[r]]
