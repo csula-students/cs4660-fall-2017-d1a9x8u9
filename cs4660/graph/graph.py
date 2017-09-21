@@ -25,6 +25,7 @@ from io import open
 from operator import itemgetter
 
 def construct_graph_from_file(graph, file_path):
+
     """
     TODO: read content from file_path, then add nodes and edges to graph object
 
@@ -37,9 +38,33 @@ def construct_graph_from_file(graph, file_path):
     3. return the graph
     """
 
-    f = open(file_path, encoding='utf-8')
-    text = f.read()
-    print(text)         
+    # Open file, w = first line and array = the rest of the file
+    with open(file_path) as f:
+        w = [int(x) for x in next(f).split()]
+        array = [[int(x) for x in line.split(':')] for line in f]
+
+    # Convert w into Integer
+    intW = int(w[0])
+        
+    # Construct graph nodes 
+    for i in range(intW):
+        node = Node(i)
+        graph.add_node(node)
+
+    # Iterate through array and get edge information then add graph edge   
+    edges = []
+    x = 0
+    for z in range(len(array)):
+        fromNode = array[x][0]
+        toNode = array[x][1]
+        weight = array[x][2]
+        edge = Edge(fromNode,toNode,weight)
+        edges.append(edge)
+        x = x + 1 
+    
+    for i in range(len(edges)):
+        graph.add_edge(edges[i])
+
     return graph
 
 class Node(object):
@@ -90,22 +115,78 @@ class AdjacencyList(object):
         self.adjacency_list = {}
 
     def adjacent(self, node_1, node_2):
-        pass
+        # Check if node_1 is in list, if it is cont. otherwise create node_1 key with node_2 value.
+        if node_1 in self.adjacency_list:
+            # If node_2 is inside node_1 key, then print out stating so otherwise append node_2 into key.
+            if node_2 in self.adjacency_list[node_1]:
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def neighbors(self, node):
-        pass
+        # Check to see if node exist, if yes then cont. otherwise print out saying so
+        if node in self.adjacency_list:
+            # Iterate through the node and print out key + value
+            neighbors = []
+            for key in self.adjacency_list[node]:
+                neighbors.append(key)
+            return neighbors
+        else:
+            return 0
 
     def add_node(self, node):
-        pass
+        if node in self.adjacency_list:
+            return False
+        else:
+            self.adjacency_list[node] = {}
+            return True
 
     def remove_node(self, node):
-        pass
+        if node in self.adjacency_list:
+            del self.adjacency_list[node]
+            return True
+        else:
+            return False
 
     def add_edge(self, edge):
-        pass
+        # Get variables from Object edge
+        fromnode = Node(edge.from_node)
+        tonode = Node(edge.to_node)
+        weight = edge.weight
+
+        # Check 2d array for fromnode and tonode, if NOT found add otherwise print out error
+        
+        print('NODE TO FIND:',fromnode)
+        for key in self.adjacency_list:
+            print(key, self.adjacency_list[key], fromnode.__eq__(key))
+
+        if fromnode in self.adjacency_list:
+            if tonode in self.adjacency_list[fromnode]:
+                return False
+            else: 
+                self.adjacency_list[fromnode][tonode] = weight
+                # print('Added edge:', fromnode, tonode, self.adjacency_list[fromnode][tonode])
+                return True
+        else:
+                return False
 
     def remove_edge(self, edge):
-        pass
+        # Get variables from Object edge
+        fromnode = edge.from_node
+        tonode = edge.to_node
+        weight = edge.weight
+
+        # Check 2d array for fromnode and tonode, if found delete otherwise print out error
+        if fromnode in self.adjacency_list:
+            if tonode in self.adjacency_list[fromnode]:
+                del self.adjacency_list[fromnode][tonode]
+                return True
+            else:
+                return False
+        else:
+            return False
 
 class AdjacencyMatrix(object):
     def __init__(self):
