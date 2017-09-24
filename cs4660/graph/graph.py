@@ -331,20 +331,67 @@ class ObjectOriented(object):
         self.nodes = []
 
     def adjacent(self, node_1, node_2):
-        pass
+        if node_1 in self.nodes:
+            if node_2 in self.nodes:
+                for i in range(len(self.edges)):
+                    currentEdge = self.edges[i]
+                    if currentEdge.from_node == node_1 and currentEdge.to_node == node_2:
+                        return True
+                return False
+        else:
+            return False
 
     def neighbors(self, node):
-        pass
+        neighbors = []
+        if node in self.nodes:
+            for i in range(len(self.edges)):
+                currentEdge = self.edges[i]
+                if currentEdge.from_node == node:
+                    n = currentEdge.to_node
+                    neighbors.append(n)
+            return neighbors
+        else:
+            return neighbors
 
     def add_node(self, node):
-        pass
+        if not node in self.nodes:
+            self.nodes.append(node)
+            return True
+        else:
+            return False
+        
 
     def remove_node(self, node):
-        pass
+        if node in self.nodes:
+            indexes = []
+            self.nodes.pop(node.data)
+            for i in range(len(self.edges)):
+                current_edge = self.edges[i]
+                if current_edge.from_node == node or current_edge.to_node == node:
+                    indexes.append(i)
+
+            index_sub = 0
+            for j in indexes:
+                del self.edges[j-index_sub]
+                index_sub = index_sub + 1
+            return True
+        else:
+            return False
 
     def add_edge(self, edge):
-        pass
+        if not edge in self.edges:
+            self.edges.append(edge)
+            return True
+        else:
+            return False
 
     def remove_edge(self, edge):
-        pass
+        if edge in self.edges:
+            for i in range(len(self.edges)):
+                if edge == self.edges[i]:
+                    del self.edges[i]
+                    return True
+        else:
+            return False
+        
 
