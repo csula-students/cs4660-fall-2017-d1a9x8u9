@@ -211,28 +211,113 @@ class AdjacencyMatrix(object):
     def __init__(self):
         # adjacency_matrix should be a two dimensions array of numbers that
         # represents how one node connects to another
-        self.adjacency_matrix = []
         # in additional to the matrix, you will also need to store a list of Nodes
         # as separate list of nodes
         self.nodes = []
+        self.adjacency_matrix = []  
 
     def adjacent(self, node_1, node_2):
-        pass
+
+        # If node_1 exist continue, else return false
+        if node_1 in self.nodes:
+
+            # Get indexes of nodes
+            indexNode1 = self.nodes.index(node_1)
+            indexNode2 = self.nodes.index(node_2)
+
+            # If not 0, then weight exist and return true, else false
+            if self.adjacency_matrix[indexNode1][indexNode2] != 0:
+                return True
+            else:
+                return False
+        else:
+            return False
+        
 
     def neighbors(self, node):
-        pass
+        # Declare empty array 
+        neighbors = []
+
+        # If nodes exist then get index of node and check each column @ index. Append all elements that arent 0 and return the neighbors array. Else if 
+        # node doesnt exist in self.nodes, then return empty 'neighbors' array
+        if node in self.nodes:
+            index = self.nodes.index(node)
+            for j in range(len(self.nodes)):
+                if self.adjacency_matrix[index][j] != 0:
+                    node = self.nodes[j]
+                    neighbors.append(node)
+            return neighbors
+        
+        else:
+            return neighbors
 
     def add_node(self, node):
-        pass
+
+        # Check node exist
+        if not node in self.nodes:
+            # Append node to 'self.nodes' array 
+            self.nodes.append(node)
+
+            # Get 'self.nodes' length so we can make empty matrix with column and row size equal to len(self.nodes)
+            nodeLength = len(self.nodes)
+            matrix = [[0 for j in range(nodeLength)] for i in range(nodeLength)] 
+           
+            # Assign 'matrix' array to 'self.adjacency_matrix'
+            self.adjacency_matrix = matrix
+
+            return True
+
+        else:
+            return False     
 
     def remove_node(self, node):
-        pass
+        # Check node exist
+        if node in self.nodes:
+            # Get index of node
+            index = self.nodes.index(node)
+
+            # Because we saved our node's index, we can pop it from 'self.nodes' matrix
+            self.nodes.pop(node.data)
+
+            # Iterate through self.adjacency_matrix and remove the element located at 'index'th index 
+            for i in range(len(self.adjacency_matrix)):
+                self.adjacency_matrix[i].pop(index)
+
+            # Remove row at 'index'
+            self.adjacency_matrix.pop(index)
+            
+            return True
+        
+        else:
+            return False
 
     def add_edge(self, edge):
-        pass
+        # Get information from edge
+        indexFromNode = self.nodes.index(edge.from_node)
+        indexToNode = self.nodes.index(edge.to_node)
+        weight = edge.weight
+
+        # Check indexes for value, if none then assign to 'weight' and return true, else return false.
+        if self.adjacency_matrix[indexFromNode][indexToNode] == 0:
+            self.adjacency_matrix[indexFromNode][indexToNode] = weight
+            return True
+
+        else:
+            return False
 
     def remove_edge(self, edge):
-        pass
+        # Get information from edge
+        indexFromNode = self.nodes.index(edge.from_node)
+        indexToNode = self.nodes.index(edge.to_node)
+        weight = edge.weight
+
+        # Check indexes for value, if weight then assign to 0 and return true, else return false.
+        if self.adjacency_matrix[indexFromNode][indexToNode] > 0:
+            self.adjacency_matrix[indexFromNode][indexToNode] = 0
+            return True
+        
+        else:
+            return False
 
     def __get_node_index(self, node):
         """helper method to find node index"""
