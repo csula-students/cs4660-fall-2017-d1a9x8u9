@@ -11,7 +11,6 @@ def bfs(graph, initial_node, dest_node):
     uses graph to do search from the initial_node to dest_node
     returns a list of actions going from the initial node to dest_node
     """
-
     frontier = Queue()    
     frontier.put(initial_node)
     came_from = {}
@@ -25,23 +24,22 @@ def bfs(graph, initial_node, dest_node):
                 came_from[next] = current
 
     
-    # TODO CONVERT NODES TO PATH
+    #  CONVERT NODES TO PATH
     current = dest_node 
     path = [current]
     while current != initial_node: 
         current = came_from[current]
         path.append(current)
-    # path.append(initial_node) # optional
     path.reverse() 
-
+    
     # Create edges from list 'path'
     edges = []
     for i in range(len(path)-1):
         distance = graph.distance(path[i],path[i+1])
         edge = g.Edge(path[i],path[i+1],distance)
         edges.append(edge) 
-        
-    return utl.convert_edge_to_grid_actions(edges)
+
+    return edges
 
 def dfs(graph, initial_node, dest_node):
     """

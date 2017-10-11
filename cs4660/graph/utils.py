@@ -139,13 +139,13 @@ def convert_edge_to_grid_actions(edges):
     """
     action = []
     for edge in edges:
-
-        tile1 = edge.from_node
-        tile2 = edge.to_node
+        
+        # tile1 = edge.from_node
+        # tile2 = edge.to_node
         weight = edge.weight    
-    
-        tile1x = tile1.x
-        tile1y = tile1.y   
+
+        tile1x = edge.from_node.data.x
+        tile1y = edge.from_node.data.y
 
         tile2x = tile2.x
         tile2y = tile2.y
