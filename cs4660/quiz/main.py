@@ -37,6 +37,77 @@ def transition_state(room_id, next_room_id):
     body = {'id': room_id, 'action': next_room_id}
     return __json_request(STATE_TRANSITION_URL, body)
 
+def bfs(start,goal):
+    frontier = Queue()    
+    frontier.put(start)
+    came_from = {}
+    came_from[start] = None
+
+    while not frontier.empty():
+
+        current = frontier.get()
+        current_room = get_state(current)
+
+        if current_room['id'] == goal:
+            break
+
+        for i in range(len(current_room['neighbors'])):
+            neighbor = current_room['neighbors'][i]['id']
+            if neighbor not in came_from:
+                frontier.put(neighbor)
+                came_from[neighbor] = current 
+
+    current = goal 
+    path = [current]
+    while current != start: 
+        current = came_from[current]
+        path.append(current)
+    path.reverse()
+    
+    print(path)
+
+def dijkstra(start,goal):
+    # DIJKSTRA 
+    # empty_room = get_state('7f3dc077574c013d98b2de8f735058b4')
+    # print(empty_room)
+    # print(transition_state(empty_room['id'], empty_room['neighbors'][0]['id']))
+
+    frontier = PriorityQueue()
+    frontier.put((0,start))
+
+    came_from = {}
+    effect_so_far = {}
+    visited = []
+    came_from[start] = None
+    effect_so_far[start] = 0
+
+    while not frontier.empty():
+        current = frontier.get()[1]
+        visited.append(current)
+        current_room = get_state(current)
+
+        if current_room['id'] == goal:
+            break
+        
+        for i in range(len(current_room['neighbors'])):
+            neighbor = current_room['neighbors'][i]['id']
+            t_state = transition_state(current_room['id'],neighbor)
+            new_effect = effect_so_far[current] + t_state['event']['effect']
+            if (neighbor not in effect_so_far or new_effect < effect_so_far[neighbor]) and neighbor not in visited:
+                effect_so_far[neighbor] = new_effect
+                priority = new_effect
+                came_from[neighbor] = current
+                frontier.put((priority,neighbor))
+
+    current = goal 
+    path = [current]
+    while current != start: 
+        current = came_from[current]
+        path.append(current)
+    path.reverse()
+    
+    print(path)    
+
 def __json_request(target_url, body):
     """
     private helper method to send JSON request and parse response JSON
@@ -51,90 +122,14 @@ def __json_request(target_url, body):
     return response
 
 if __name__ == "__main__":
-    # Your code starts here
 
-    # empty_room = get_state('7f3dc077574c013d98b2de8f735058b4')
-    # print(empty_room)
-    # print(transition_state(empty_room['id'], empty_room['neighbors'][0]['id']))
-    
     s_id = '7f3dc077574c013d98b2de8f735058b4'
     f_id = 'f1f131f647621a4be7c71292e79613f9'
 
-    frontier = Queue()    
-    frontier.put('7f3dc077574c013d98b2de8f735058b4')
-    came_from = {}
-    came_from[s_id] = None
-
-    while not frontier.empty():
-
-        current = frontier.get()
-        current_room = get_state(current)
-
-        if current_room['id'] == f_id:
-            break
-
-        for i in range(len(current_room['neighbors'])):
-            neighbor = current_room['neighbors'][i]['id']
-            if neighbor not in came_from:
-                frontier.put(neighbor)
-                came_from[neighbor] = current 
-
-    current = f_id 
-    path = [current]
-    while current != s_id: 
-        current = came_from[current]
-        path.append(current)
-    path.reverse()
-    
-    print(path)
+    bfs(s_id,f_id)
+    dijkstra(s_id,f_id)
 
 
-    # DIJKSTRA 
-    empty_room = get_state('7f3dc077574c013d98b2de8f735058b4')
-    print(empty_room)
-    print(transition_state(empty_room['id'], empty_room['neighbors'][0]['id']))
 
-    frontier = PriorityQueue()
-    frontier.put((0,s_id))
 
-    came_from = {}
-    effect_so_far = {}
-    came_from[s_id] = None
-    effect_so_far[s_id] = 0
 
-    while not frontier.empty():
-
-        current = frontier.get()[1]
-        print(current)
-        current_room = get_state(current)
-        print(current_room)
-
-        if current_room['id'] == f_id:
-            print('f_id found!')
-            break
-        
-        for i in range(len(current_room['neighbors'])):
-            neighbor = current_room['neighbors'][i]['id']
-
-            print('NEIGHBOR',neighbor)
-        
-            t_state = transition_state(current_room['id'],neighbor)
-            # print(t_state)
-            new_effect = effect_so_far[current] + t_state['event']['effect']
-        
-            if neighbor not in effect_so_far or new_effect < effect_so_far[neighbor]:
-                effect_so_far[neighbor] = new_effect
-                priority = new_effect
-                came_from[neighbor] = current
-                frontier.put((priority,neighbor))
-            else:
-                print('already in')
-
-    current = f_id 
-    path = [current]
-    while current != s_id: 
-        current = came_from[current]
-        path.append(current)
-    path.reverse()
-    
-    print(path)
