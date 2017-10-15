@@ -42,93 +42,56 @@ def parse_grid_file(graph, file_path):
     # TODO: for each node/edge above, add it to graph
 
     # Open file and read
-    with open(file_path) as f:
-        content = f.readlines()
+    f = open(file_path)
 
-    # Create a List for each line in 'content'
-    content= [x.strip() for x in content]
-    
-    # 'mode_content' will hold the modified content list
-    filteredContent = []
+    rows = []
 
-    # If the row starts with '+' or '-' then ignore. else add the row to filteredContent 
-    for row in content:
-        if row[0] == '+' or row[0] == '-':
+    for line in f:
+        if line[0] == '+' or line[0] == '-':
             continue
-        else: 
-            # Take the '|' out from the row and append to 'filteredContent'
-            filteredContent.append(row[1:len(row)-1])
+        filteredrow = line[1:-2]
+        rows.append([filteredrow[i:i+2] for i in range(0, len(filteredrow), 2)])
     
-    # Go through rows. For each row and using step_size=2, check if node. If yes then add to graph, else ignore.
+    f.close()
+
+    nodes = []
+    edges = []
+
     y = 0
-    for row in filteredContent:
-        for x in range(0,len(row),2):
-            if row[x] == '#':
+    for row in rows:
+        x = 0
+        for block in row:
+            if block == '##':
+                x += 1
                 continue
-            else:
-                node = g.Node(Tile(x,y,filteredContent[y][x]))
-                graph.add_node(node)
-                # Add neighbors
 
-                # Check top Tile
-                if y > 0:
-                    if(filteredContent[y-1][x] == '#'):
-                        continue
-                    else:
-                        # Create node 
-                        NodeToCheck = g.Node(Tile(x,y-1,filteredContent[y-1][x]))
-                        
-                        # Check if current index node is adjacent to top node
-                        if(graph.adjacent(node,NodeToCheck)):
-                            print('Edge already here')
-                        else:
-                            edge = g.Edge(node,NodeToCheck,1)
-                            graph.add_edge(edge)
+            curr_node = g.Node(Tile(x, y, block))
+            nodes.append(curr_node)
+            
+            right = (x + 1, y)
+            left = (x - 1, y)
+            up = (x, y + 1)
+            down = (x, y - 1)
+            neighbors = [right,left,up,down]   
+            
+            for neighbor in neighbors:
+                if neighbor[0] >= len(rows[0]) or neighbor[0] < 0 or neighbor[1] >= len(rows) or neighbor[1] < 0:   # Bound check
+                    continue
+                neighbor_block = rows[neighbor[1]][neighbor[0]]
+                if neighbor_block == '##':
+                    continue
+                
+                neighbor_node = g.Node(Tile(neighbor[0], neighbor[1], neighbor_block))
+                edges.append(g.Edge(curr_node, neighbor_node, 1))
+            
+            x += 1
+        y += 1
 
-                # Check bottom Tile
-                if y < len(filteredContent) - 1:
-                    if(filteredContent[y+1][x] == '#'):
-                        continue
-                    else:
-                        # Create node 
-                        NodeToCheck = g.Node(Tile(x,y+1,filteredContent[y+1][x]))
-                        # Check if current index node is adjacent to top node
-                        if(graph.adjacent(node,NodeToCheck)):
-                            print('Edge already here')
-                        else:
-                            edge = g.Edge(node,NodeToCheck,1)
-                            graph.add_edge(edge)
+    for node in nodes:
+        graph.add_node(node)
+    for edge in edges:
+        graph.add_edge(edge)
 
-                # Check right Tile
-                if x < len(row) - 2:
-                    if(filteredContent[y][x+2] == '#'):
-                        continue
-                    else:
-                        # Create node 
-                        NodeToCheck = g.Node(Tile(x+2,y,filteredContent[y][x+2]))
-                        
-                        # Check if current index node is adjacent to top node
-                        if(graph.adjacent(node,NodeToCheck)):
-                            print('Edge already here')
-                        else:
-                            edge = g.Edge(node,NodeToCheck,1)
-                            graph.add_edge(edge)
-             
-                # Check left Tile
-                if x > 1:
-                    if(filteredContent[y][x-2] == '#'):
-                        continue
-                    else:
-                        # Create node 
-                        NodeToCheck = g.Node(Tile(x-2,y,filteredContent[y][x-2]))
-                        
-                        # Check if current index node is adjacent to top node
-                        if(graph.adjacent(node,NodeToCheck)):
-                            print('Edge already here')
-                        else:
-                            edge = g.Edge(node,NodeToCheck,1)
-                            graph.add_edge(edge)   
-        y = y + 1
     return graph
 
 def convert_edge_to_grid_actions(edges):
@@ -137,32 +100,17 @@ def convert_edge_to_grid_actions(edges):
 
     e.g. Edge(Node(Tile(1, 2), Tile(2, 2), 1)) => "S"
     """
-    action = []
+    actions = []
+
     for edge in edges:
         
-        # tile1 = edge.from_node
-        # tile2 = edge.to_node
-        weight = edge.weight    
-
-        tile1x = edge.from_node.data.x
-        tile1y = edge.from_node.data.y
-
-        tile2x = tile2.x
-        tile2y = tile2.y
-
-        x = tile2x - tile1x
-        y = tile2y - tile1y
-
-        if x == 0:
-            if y > 0:
-                action.append("S")
-            else:
-                action.append("N")
+        if edge.from_node.data.x > edge.to_node.data.x:
+            actions.append('W')
+        elif edge.from_node.data.x < edge.to_node.data.x:
+            actions.append('E')
+        elif edge.from_node.data.y > edge.to_node.data.y:
+            actions.append('N')
         else:
-            if x > 0:
-                action.append("E")
-            else:
-                action.append("W")
+            actions.append('S')
 
-    print(action)
-    return action
+    return ''.join(actions)
