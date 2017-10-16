@@ -41,7 +41,9 @@ def bfs(start,goal):
     frontier = Queue()    
     frontier.put(start)
     came_from = {}
-    came_from[start] = None
+    came_from[start] = None     
+    effect_so_far = {}
+    effect_so_far[start] = 0
 
     while not frontier.empty():
 
@@ -49,13 +51,19 @@ def bfs(start,goal):
         current_room = get_state(current)
 
         if current_room['id'] == goal:
+            print(effect_so_far[current])
             break
 
         for i in range(len(current_room['neighbors'])):
             neighbor = current_room['neighbors'][i]['id']
+
+            t_state = transition_state(current_room['id'],neighbor)
+            new_effect = effect_so_far[current] + t_state['event']['effect']
+
             if neighbor not in came_from:
-                frontier.put(neighbor)
+                effect_so_far[neighbor] = new_effect
                 came_from[neighbor] = current 
+                frontier.put(neighbor)
 
     current = goal 
     path = [current]
@@ -63,7 +71,7 @@ def bfs(start,goal):
         current = came_from[current]
         path.append(current)
     path.reverse()
-    
+
     print(path)
 
 def dijkstra(start,goal):
@@ -85,19 +93,20 @@ def dijkstra(start,goal):
         current = frontier.get()[1]
         visited.append(current)
         current_room = get_state(current)
-
         if current_room['id'] == goal:
+            print('Total Hp:',effect_so_far[current])
             break
         
         for i in range(len(current_room['neighbors'])):
             neighbor = current_room['neighbors'][i]['id']
-            t_state = transition_state(current_room['id'],neighbor)
-            new_effect = effect_so_far[current] + t_state['event']['effect']
-            if (neighbor not in effect_so_far or new_effect < effect_so_far[neighbor]) and neighbor not in visited:
-                effect_so_far[neighbor] = new_effect
-                priority = new_effect
-                came_from[neighbor] = current
-                frontier.put((priority,neighbor))
+            if neighbor not in visited:
+                t_state = transition_state(current_room['id'],neighbor)
+                new_effect = effect_so_far[current] + t_state['event']['effect']
+                if neighbor not in effect_so_far or new_effect < effect_so_far[neighbor]:
+                    effect_so_far[neighbor] = new_effect
+                    priority = new_effect
+                    came_from[neighbor] = current
+                    frontier.put((priority,neighbor))
 
     current = goal 
     path = [current]
