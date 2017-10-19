@@ -8,9 +8,8 @@ import heapq
 
 try:
     from queue import *
-
 except ImportError:
-    import queue
+    from queue import Queue 
     
 def bfs(graph, initial_node, dest_node):
     # BFS FIFO
