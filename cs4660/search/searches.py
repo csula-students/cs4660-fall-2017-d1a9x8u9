@@ -7,13 +7,14 @@ from graph import utils as u
 import heapq
 
 try:
-    from queue import *
+    import Queue as Q  # ver. < 3.0
 except ImportError:
-    from multiprocessing import Queue
+    import queue as Q
+
     
 def bfs(graph, initial_node, dest_node):
     # BFS FIFO
-    frontier = Queue()    
+    frontier = Q.Queue() 
     frontier.put(initial_node)
     came_from = {}
     came_from[initial_node] = None
@@ -61,7 +62,7 @@ def dijkstra_search(graph, initial_node, dest_node):
 
     # Need key in order to compare Node()'s
     key = 1 
-    frontier = PriorityQueue()
+    frontier = Q.PriorityQueue()
     frontier.put((0,key,initial_node))
 
     came_from = {}
@@ -93,7 +94,7 @@ def a_star_search(graph, initial_node, dest_node):
     uses graph to do search from the initial_node to dest_node
     returns a list of actions going from the initial node to dest_node
     """
-    frontier = PriorityQueue()
+    frontier = Q.PriorityQueue()
     key = 1
     frontier.put((0,key,initial_node))
     came_from = {}
