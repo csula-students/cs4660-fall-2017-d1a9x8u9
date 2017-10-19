@@ -9,7 +9,7 @@ import heapq
 try:
     from queue import *
 except ImportError:
-    from queue import Queue 
+    from multiprocessing import Queue
     
 def bfs(graph, initial_node, dest_node):
     # BFS FIFO
