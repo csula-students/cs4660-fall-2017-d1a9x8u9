@@ -6,6 +6,7 @@ from graph import graph as g
 from graph import utils as u
 import heapq
 from queue import *
+from multiprocessing import Queue
 
 def bfs(graph, initial_node, dest_node):
     # BFS FIFO
