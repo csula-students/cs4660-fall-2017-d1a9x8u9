@@ -5,8 +5,13 @@ Searches module defines all different search algorithms
 from graph import graph as g
 from graph import utils as u
 import heapq
-from multiprocessing import Queue
 
+try:
+    from queue import *
+
+except ImportError:
+    import queue
+    
 def bfs(graph, initial_node, dest_node):
     # BFS FIFO
     frontier = Queue()    
