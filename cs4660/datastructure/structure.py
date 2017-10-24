@@ -74,4 +74,3 @@ class HashTable(object):
         address = self.hashKey(key)
         if address in self.memory:
             del self.memory[address]
-
